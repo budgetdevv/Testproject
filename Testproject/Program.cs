@@ -1,11 +1,18 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
-
 using System.Diagnostics;
 
-BenchmarkRunner.Run<StopwatchBenchmark>();
+var config = DefaultConfig.Instance;
 
-[DisassemblyDiagnoser]
+if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+{
+    config = config.AddDiagnoser(new DisassemblyDiagnoser(new()));
+}
+
+BenchmarkRunner.Run<StopwatchBenchmark>(config);
+
 public class StopwatchBenchmark
 {
     public static readonly long FrequencyPerMillisecond = Stopwatch.Frequency / TimeSpan.MillisecondsPerSecond;
